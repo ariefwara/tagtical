@@ -32,3 +32,29 @@ const expected =
     ]), 
     "</section>"
   ]);
+
+  console.log(template.render({
+    articles: [
+      {
+        isVisible: true,
+        authors: [{ name: "John Doe" }, { name: "Jane Doe" }]
+      },
+      {
+        isVisible: false,
+        authors: [{ name: "Hidden Author" }]
+      }
+    ]
+  }));
+
+  console.log(expected.render({
+    articles: [
+      {
+        isVisible: true,
+        authors: [{ name: "John Doe" }, { name: "Jane Doe" }]
+      },
+      {
+        isVisible: false,
+        authors: [{ name: "Hidden Author" }]
+      }
+    ]
+  }));

@@ -1,11 +1,12 @@
 {
   "name": "tagtical",
   "version": "1.0.0",
-  "description": "html tag-like template engine",
+  "description": "A sophisticated template engine enhancing HTML with logic through custom tags like <set:if> and <set:for> for dynamic content generation.",
+  "keywords": ["template engine", "HTML", "custom tags", "dynamic content", "logic embedded"],
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "ariefwara",
+  "author": "Arief Warazuhudien <https://ariefwara.com>",
   "license": "ISC"
 }
