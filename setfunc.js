@@ -1,7 +1,11 @@
 
 class Set {
 
-    constructor(attributes = {}, segments = []){}
+    constructor(attributes = {}, segments = []) {
+        this.attributes = attributes;
+        this.segments = segments;
+    }
+
     render(parameters){
         let renderedContent = '';
         if (this.segments && this.segments.length > 0) {
@@ -25,7 +29,7 @@ class SetIf extends Set {
     }
 
     render(parameters) {
-        if (new Function('return ' + this.condition).call(parameters)) {
+        if (new Function(...Object.keys(parameters), 'return ' + this.condition)(...Object.values(parameters))) {
             return super.render(parameters);
         }
         return '';

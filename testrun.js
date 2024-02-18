@@ -1,4 +1,3 @@
-const { SetFunc } = require('./setfunc.js');
 const Template = require('./template.js');
 
 const htmlString = `
@@ -19,42 +18,15 @@ const htmlString = `
 `;
 
 const template = new Template(htmlString);
-
-const expected = 
-  new SetFunc['vessel']({}, [
-    "<h1>Title</h1><p>Description paragraph here.</p><section>",
-    new SetFunc['for']({in: 'articles', each: 'article'}, [
-      new SetFunc['if']({condition: 'article.isVisible'}, [
-        new SetFunc['for']({in: 'article.authors', each: 'author'}, [
-          "<article><header>Article Header by {author.name}</header><footer>Article Footer</footer></article>"
-        ])
-      ])
-    ]), 
-    "</section>"
-  ]);
-
-  console.log(template.render({
-    articles: [
-      {
-        isVisible: true,
-        authors: [{ name: "John Doe" }, { name: "Jane Doe" }]
-      },
-      {
-        isVisible: false,
-        authors: [{ name: "Hidden Author" }]
-      }
-    ]
-  }));
-
-  console.log(expected.render({
-    articles: [
-      {
-        isVisible: true,
-        authors: [{ name: "John Doe" }, { name: "Jane Doe" }]
-      },
-      {
-        isVisible: false,
-        authors: [{ name: "Hidden Author" }]
-      }
-    ]
-  }));
+console.log(template.render({
+  articles: [
+    {
+      isVisible: true,
+      authors: [{ name: "John Doe" }, { name: "Jane Doe" }]
+    },
+    {
+      isVisible: true,
+      authors: [{ name: "Hidden Author" }]
+    }
+  ]
+}));

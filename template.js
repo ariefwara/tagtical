@@ -28,7 +28,8 @@ class Template {
             // Process the tag
             const TagClass = SetFunc[tagName];
             if (TagClass) {
-                const childSegments = new Template(content).#parse(); // Recursively parse inner content
+                // Corrected to parse the content of the current match
+                const childSegments = this.#parse(content); // Recursively parse inner content
                 segments.push(new TagClass(attributes, childSegments));
             } else {
                 console.error(`Unknown tag: ${tagName}`);
@@ -43,7 +44,6 @@ class Template {
         }
 
         return new SetFunc['vessel']({}, segments);
-
     }
 
     #attrs(attributesString) {
