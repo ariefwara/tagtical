@@ -4,11 +4,12 @@ const { v4: uuidv4 } = require('uuid');
 const window = new Window();
 const document = window.document;
 
+const contextMap = {};
 class ARIf extends HTMLElement {
     constructor() {
         super();
         this.originalContent = '';
-        this.condition = false;
+        this.condition = '';
     }
 
     static get observedAttributes() {
@@ -16,7 +17,10 @@ class ARIf extends HTMLElement {
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'condition') this.condition = new Function(`return ${newValue}`)(), this.render();
+        if (name === 'condition') {
+            this.condition = newValue;
+            this.render();
+        }
     }
 
     connectedCallback() {
@@ -25,7 +29,12 @@ class ARIf extends HTMLElement {
     }
 
     render() {
-        this.innerHTML = this.condition ? this.originalContent : '';
+        const value = this.getAttribute('var');
+        const rootElement = this.closest('.root');
+        const context = contextMap[rootElement.id];
+       
+        const result = new Function(...Object.keys(context), 'return ' + value)(...Object.values(context));
+        this.innerHTML = result ? this.originalContent : '';
     }
 }
 
@@ -50,6 +59,9 @@ class ARFor extends HTMLElement {
     }
 
     render() {
+        const value = this.getAttribute('var');
+        const rootElement = this.closest('.root');
+        const context = contextMap[rootElement.id];
         this.innerHTML = this.each && this.in.length ? this.in.map(item => {
             const itemElement = document.createElement(this.each);
             Object.entries(item).forEach(([key, value]) => itemElement.setAttribute(key, value));
@@ -58,18 +70,53 @@ class ARFor extends HTMLElement {
     }
 }
 
+class ARView extends HTMLElement {
+    constructor() {
+        super();
+        this.var = '';
+    }
+
+    static get observedAttributes() {
+        return ['var'];
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (name === 'var') {
+            this.var = newValue;
+            this.render();
+        }
+    }
+
+    connectedCallback() {
+        this.render();
+    }
+
+    render() {
+        const value = this.getAttribute('var');
+        const rootElement = this.closest('.root');
+        const context = contextMap[rootElement.id];
+       
+        const result = new Function(...Object.keys(context), 'return ' + value)(...Object.values(context));
+        this.innerHTML = result;
+    }
+}
+
+
 window.customElements.define('ar-if', ARIf);
 window.customElements.define('ar-for', ARFor);
+window.customElements.define('ar-view', ARView);
 
 class Tagtical {
 
-    static render(htmlString){
+    static render(htmlString, parameters){
         const uniqueId = uuidv4();
+        contextMap[uniqueId] = parameters;
         const div = document.createElement('div');
         div.id = uniqueId;
+        div.className = 'root';
         div.innerHTML = htmlString;
         document.body.appendChild(div);
-        return document.getElementById(uniqueId).outerHTML;
+        return document.getElementById(uniqueId).innerHTML;
     }
 
 }
