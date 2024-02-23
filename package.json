@@ -16,6 +16,7 @@
   "author": "Arief Warazuhudien <https://ariefwara.com>",
   "license": "ISC",
   "dependencies": {
-    "happy-dom": "^13.4.1"
+    "happy-dom": "^13.4.1",
+    "uuid": "^9.0.1"
   }
 }
