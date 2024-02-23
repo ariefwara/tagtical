@@ -29,11 +29,10 @@ class ARIf extends HTMLElement {
     }
 
     render() {
-        const value = this.getAttribute('var');
         const rootElement = this.closest('.root');
         const context = contextMap[rootElement.id];
        
-        const result = new Function(...Object.keys(context), 'return ' + value)(...Object.values(context));
+        const result = new Function(...Object.keys(context), 'return ' + this.condition)(...Object.values(context));
         this.innerHTML = result ? this.originalContent : '';
     }
 }
@@ -43,6 +42,7 @@ class ARFor extends HTMLElement {
         super();
         this.each = '';
         this.in = [];
+        this.originalContent = '';
     }
 
     static get observedAttributes() {
@@ -55,18 +55,21 @@ class ARFor extends HTMLElement {
     }
 
     connectedCallback() {
+        this.originalContent = this.originalContent || this.innerHTML;
         this.render();
     }
 
     render() {
-        const value = this.getAttribute('var');
         const rootElement = this.closest('.root');
         const context = contextMap[rootElement.id];
-        this.innerHTML = this.each && this.in.length ? this.in.map(item => {
-            const itemElement = document.createElement(this.each);
-            Object.entries(item).forEach(([key, value]) => itemElement.setAttribute(key, value));
-            return itemElement.outerHTML;
-        }).join('') : '';
+        const items = context[this.in];
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'volatile';
+            context[this.each] = item;
+            div.innerHTML = this.originalContent;
+            this.appendChild(div);
+        });
     }
 }
 
@@ -116,6 +119,10 @@ class Tagtical {
         div.className = 'root';
         div.innerHTML = htmlString;
         document.body.appendChild(div);
+
+        const customElements = div.querySelectorAll('ar-if, ar-view, ar-for', '.volatile');
+        customElements.forEach(el => { el.outerHTML = el.innerHTML; });
+
         return document.getElementById(uniqueId).innerHTML;
     }
 
