@@ -30,6 +30,7 @@ class ARIf extends HTMLElement {
 
     render() {
         const rootElement = this.closest('.root');
+        if (!rootElement) return;
         const context = contextMap[rootElement.id];
        
         const result = new Function(...Object.keys(context), 'return ' + this.condition)(...Object.values(context));
@@ -40,8 +41,8 @@ class ARIf extends HTMLElement {
 class ARFor extends HTMLElement {
     constructor() {
         super();
-        this.each = '';
-        this.in = [];
+        this.each = undefined;
+        this.in = undefined;
         this.originalContent = '';
     }
 
@@ -50,8 +51,10 @@ class ARFor extends HTMLElement {
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        this[name] = name === 'in' ? JSON.parse(newValue) || [] : newValue;
-        this.render();
+        this[name] = newValue;
+        if (this.each !== undefined && this.in !== undefined) {
+            this.render();
+        }
     }
 
     connectedCallback() {
@@ -61,14 +64,17 @@ class ARFor extends HTMLElement {
 
     render() {
         const rootElement = this.closest('.root');
+        if (!rootElement) return;
         const context = contextMap[rootElement.id];
         const items = context[this.in];
+        if (!items) return;
+        this.innerHTML = '';
         items.forEach(item => {
             const div = document.createElement('div');
-            div.className = 'volatile';
+            div.className = this.each;
             context[this.each] = item;
             div.innerHTML = this.originalContent;
-            this.appendChild(div);
+            this.appendChild(div)
         });
     }
 }
@@ -97,6 +103,7 @@ class ARView extends HTMLElement {
     render() {
         const value = this.getAttribute('var');
         const rootElement = this.closest('.root');
+        if (!rootElement) return;
         const context = contextMap[rootElement.id];
        
         const result = new Function(...Object.keys(context), 'return ' + value)(...Object.values(context));
@@ -112,6 +119,9 @@ window.customElements.define('ar-view', ARView);
 class Tagtical {
 
     static render(htmlString, parameters){
+
+        // htmlString = htmlString.replace(/\{\{(.*?)\}\}/g, (match, p1) => `<ar-view var="${p1.trim()}"/>`);
+
         const uniqueId = uuidv4();
         contextMap[uniqueId] = parameters;
         const div = document.createElement('div');
@@ -120,7 +130,7 @@ class Tagtical {
         div.innerHTML = htmlString;
         document.body.appendChild(div);
 
-        const customElements = div.querySelectorAll('ar-if, ar-view, ar-for', '.volatile');
+        const customElements = document.getElementById(uniqueId).querySelectorAll('ar-if, ar-view, ar-for', '.volatile');
         customElements.forEach(el => { el.outerHTML = el.innerHTML; });
 
         return document.getElementById(uniqueId).innerHTML;

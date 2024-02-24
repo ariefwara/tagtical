@@ -1,7 +1,11 @@
 {
   "name": "tagtical",
-  "version": "1.0.0",
-  "description": "A sophisticated template engine enhancing HTML with logic through custom tags like <set:if> and <set:for> for dynamic content generation.",
+  "version": "1.0.4",
+  "description": "An HTML-like template engine designed to enhance HTML with logic through custom tags such as <ar-if>, <ar-for>, and <ar-view> for dynamic content generation.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ariefwara/tagtical.git"
+  },
   "keywords": [
     "template engine",
     "HTML",
